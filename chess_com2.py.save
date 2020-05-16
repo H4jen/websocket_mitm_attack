@@ -155,23 +155,32 @@ class InMessage:
                                              stdscr.move(11,0)
                                              stdscr.clrtoeol()
                                              stdscr.addstr(11,0,"Current score is : " + CURRENT_SCORE)
-                                        else :
-                                             stdscr.move(11,0)
-                                             stdscr.clrtoeol()
-                                             stdscr.move(10,0)
-                                             stdscr.clrtoeol()
-                                             stdscr.addstr(10,0,"Best move is OFF use b key to toggle")
-
+                                        # form is {"move": "g2h3", "Score": "-1323"}
+                                        #if(len(stocky_result) == 2):
+                                        #        CURRENT_BEST_MOVE = stocky_result["move"]
+                                        #        CURRENT_SCORE = stocky_result["Score"]
                                         if (SHOW_IF_BEST_MOVE_WAS_PLAYED == "ON"):
+                                             stdscr.move(15,0)
+                                             stdscr.clrtoeol()
+                                             stdscr.addstr(15,0,"made move: " + moves_uci[-1])
+                                             stdscr.move(16,0)
+                                             
+                                             print("best move : " + LAST_BEST_MOVE)
                                              stdscr.move(13,0)
                                              stdscr.clrtoeol()
                                              if(LAST_BEST_MOVE == moves_uci[-1]):
                                                   stdscr.addstr(13,0,"$$$$$  BEAST MOVE WAS PLAYED!!! $$$$$")
                                              LAST_BEST_MOVE = CURRENT_BEST_MOVE
+                                             #stdscr.move(14,0)
+                                             #stdscr.clrtoeol()
+                                             #stdscr.addstr(14,0,"Current score is : " + CURRENT_SCORE)
                                         else :
-                                             stdscr.move(13,0)
+                                             stdscr.move(10,0)
                                              stdscr.clrtoeol()
-                                             stdscr.addstr(13,0,"Best score shout is OFF use s key to toggle")
+                                             stdscr.addstr(10,0,"Best move is OFF use b key to toggle")
+                                             stdscr.addstr(11,0,"Best score shout is OFF use s key to toggle")
+                                #stdscr.addstr(17,0,"Latest move is:" + chess_com_notation_to_uci(moves_uci[-1])
+
 
 p = subprocess.Popen(["mitmdump", "-s", "websocket_messages.py"],universal_newlines=True, stdout=subprocess.PIPE)
 stocky = Engine(depth=20)
@@ -183,7 +192,6 @@ stdscr.nodelay(1) # set getch() non-blocking
 stdscr.addstr(0,0,"To use press the below keys")
 stdscr.addstr(2,0,"\"q\" to exit...")
 stdscr.addstr(3,0,"\"b\" to toggle bestmove...")
-stdscr.addstr(4,0,"\"s\" to toggle best move SHOUT!!...")
 line = 1
 
 try:
