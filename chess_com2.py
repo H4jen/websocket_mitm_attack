@@ -12,8 +12,10 @@ from pystockfish import *
 
 DEBUG_LEVEL = "OFF" #Debug levels are:  Off, MSG, MOVES
 SHOW_BEST_MOVE = "ON"
-
-
+SHOW_SCORE_OF_MOVE = "ON"
+SHOW_IF_BEST_MOVE_WAS_PLAYED = "ON"
+LAST_BEST_MOVE = "EMPTY"
+CURRENT_BEST_MOVE = "EMPTY"
 def chess_com_notation_to_uci(chess_com_notation):
 	switcher = {
 		"a": "a1",
@@ -119,7 +121,8 @@ class InMessage:
             return
         if (len(self.msg) > 60):
        		if(self.msg[55] == "moves"):
-
+                        #new move. current is now last best move
+                        LAST_BEST_MOVE = CURRENT_BEST_MOVE
                         moves=self.msg[57]
                         if(DEBUG_LEVEL == "MOVES"): 
                                 stdscr.addstr(7,0,"Moves string chess.com is:" + moves)
@@ -132,20 +135,26 @@ class InMessage:
                                         for elem in movee:
                                                 move_string = move_string + chess_com_notation_to_uci(elem)
                                         moves_uci.append(move_string)
+                                        #stdscr.addstr(17,0,"Latest move is:" + chess_com_notation_to_uci(moves_uci[-1])
                                 if(len(moves_uci) == 1):
                                         print("We have a NEW game")
                                 if(DEBUG_LEVEL == "MOVES"): 
                                         stdscr.addstr(8,0,"Moves string UCI is:" + "".join(moves_uci))
                                 stocky.newgame()
                                 stocky.setposition(moves_uci)
+                                stocky_result = stocky.bestmove()
+
                                 if (SHOW_BEST_MOVE == "ON"):
                                         stdscr.move(10,0)
                                         stdscr.clrtoeol()
                                         stdscr.addstr(10,0,json.dumps(stocky.bestmove()))
+                                        stdscr.move(20,0)
+                                        print(len(stocky_result))
                                 else :
                                         stdscr.move(10,0)
                                         stdscr.clrtoeol()
                                         stdscr.addstr(10,0,"Best move is OFF use b key to toggle")
+                                #stdscr.addstr(17,0,"Latest move is:" + chess_com_notation_to_uci(moves_uci[-1])
 
 
 p = subprocess.Popen(["mitmdump", "-s", "websocket_messages.py"],universal_newlines=True, stdout=subprocess.PIPE)
@@ -190,6 +199,7 @@ try:
                  else:
                        rx_msg = InMessage(crop_line,message_dir)
 
+finally:
     curses.endwin()
     p.kill()
 
