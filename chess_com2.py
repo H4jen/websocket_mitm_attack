@@ -9,7 +9,7 @@ import json
 from pystockfish import *
 
 DEBUG_LEVEL = "OFF" #Debug levels are:  Off, MSG, MOVES
-SHOW_BEST_MOVE = "ON"
+SHOW_BEST_MOVE = "OFF"
 SHOW_SCORE_OF_MOVE = "ON"
 SHOW_IF_BEST_MOVE_WAS_PLAYED = "ON"
 LAST_BEST_MOVE = "EMPTY"
@@ -167,11 +167,22 @@ class InMessage:
                                              stdscr.clrtoeol()
                                              if(LAST_BEST_MOVE == moves_uci[-1]):
                                                   stdscr.addstr(13,0,"$$$$$  BEAST MOVE WAS PLAYED!!! $$$$$")
+                                             else :
+                                                  stdscr.addstr(13,0,"Best move was:" + LAST_BEST_MOVE)
                                              LAST_BEST_MOVE = CURRENT_BEST_MOVE
                                         else :
                                              stdscr.move(13,0)
                                              stdscr.clrtoeol()
                                              stdscr.addstr(13,0,"Best score shout is OFF use s key to toggle")
+
+                                        if (SHOW_SCORE_OF_MOVE == "ON"):
+                                             stdscr.move(15,0)
+                                             stdscr.clrtoeol()
+                                             stdscr.addstr(15,0,"Current score is : " + CURRENT_SCORE)
+                                        else :
+                                             stdscr.move(15,0)
+                                             stdscr.clrtoeol()
+                                             stdscr.addstr(15,0,"Score is OFF use d key to toggle")
 
 p = subprocess.Popen(["mitmdump", "-s", "websocket_messages.py"],universal_newlines=True, stdout=subprocess.PIPE)
 stocky = Engine(depth=20)
@@ -184,6 +195,7 @@ stdscr.addstr(0,0,"To use press the below keys")
 stdscr.addstr(2,0,"\"q\" to exit...")
 stdscr.addstr(3,0,"\"b\" to toggle bestmove...")
 stdscr.addstr(4,0,"\"s\" to toggle best move SHOUT!!...")
+stdscr.addstr(4,0,"\"d\" to toggle score view!!...")
 line = 1
 
 try:
@@ -197,6 +209,10 @@ try:
        if c == ord('s'):
            if (SHOW_IF_BEST_MOVE_WAS_PLAYED == "ON"): SHOW_IF_BEST_MOVE_WAS_PLAYED = "OFF"
            else : SHOW_IF_BEST_MOVE_WAS_PLAYED = "ON"
+       if c == ord('d'):
+           if (SHOW_SCORE_OF_MOVE == "ON"): SHOW_SCORE_OF_MOVE = "OFF"
+           else : SHOW_SCORE_OF_MOVE = "ON"
+
        elif c == ord('q'): break
 
        line=p.stdout.readline()
