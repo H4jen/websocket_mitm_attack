@@ -119,9 +119,11 @@ class InMessage:
             return
         if (len(self.msg) > 60):
        		if(self.msg[55] == "moves"):
+
                         moves=self.msg[57]
-       	                #if(DEBUG_LEVEL == "MOVES"): print("Moves string is:" + moves)
-                        #put moves in string array
+                        if(DEBUG_LEVEL == "MOVES"): 
+                                stdscr.addstr(7,0,"Moves string chess.com is:" + moves)
+
                         moves = re.findall('..',moves)
                         if(len(moves) > 1):
                                 moves_uci = []
@@ -132,10 +134,18 @@ class InMessage:
                                         moves_uci.append(move_string)
                                 if(len(moves_uci) == 1):
                                         print("We have a NEW game")
+                                if(DEBUG_LEVEL == "MOVES"): 
+                                        stdscr.addstr(8,0,"Moves string UCI is:" + "".join(moves_uci))
                                 stocky.newgame()
                                 stocky.setposition(moves_uci)
-                                if (SHOW_BEST_MOVE == "ON"): stdscr.addstr(10,0,json.dumps(stocky.bestmove())) #print(stocky.bestmove())
-
+                                if (SHOW_BEST_MOVE == "ON"):
+                                        stdscr.move(10,0)
+                                        stdscr.clrtoeol()
+                                        stdscr.addstr(10,0,json.dumps(stocky.bestmove()))
+                                else :
+                                        stdscr.move(10,0)
+                                        stdscr.clrtoeol()
+                                        stdscr.addstr(10,0,"Best move is OFF use b key to toggle")
 
 
 p = subprocess.Popen(["mitmdump", "-s", "websocket_messages.py"],universal_newlines=True, stdout=subprocess.PIPE)
@@ -146,16 +156,17 @@ curses.noecho()
 stdscr.nodelay(1) # set getch() non-blocking
 
 stdscr.addstr(0,0,"To use press the below keys")
-stdscr.addstr(1,0,"\"q\" to exit...")
+stdscr.addstr(2,0,"\"q\" to exit...")
+stdscr.addstr(3,0,"\"b\" to toggle bestmove...")
 line = 1
 
 try:
     message_dir = "none"
     while True:
        c = stdscr.getch()
-       if c == ord('p'):
-            stdscr.addstr(line,0,"Some text here")
-            line += 1
+       if c == ord('b'):
+           if (SHOW_BEST_MOVE == "ON"): SHOW_BEST_MOVE = "OFF"
+           else : SHOW_BEST_MOVE = "ON"
        elif c == ord('q'): break
 
        line=p.stdout.readline()
@@ -163,7 +174,7 @@ try:
            continue
        #Print evrything received. If debuglevel = high
        if (DEBUG_LEVEL== "MSG"): print(line)
-       #filter out incoming message. And send to parser
+
        if isinstance(line, str):
            if "<- WebSocket 1 message <-" in line:
                message_dir = "input"
@@ -179,9 +190,6 @@ try:
                  else:
                        rx_msg = InMessage(crop_line,message_dir)
 
-finally:
     curses.endwin()
     p.kill()
 
-#except KeyboardInterrupt:
-#    pass
